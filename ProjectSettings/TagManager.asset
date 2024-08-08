@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Page
   - Btn
+  - tarrot_card
   layers:
   - Default
   - TransparentFX
