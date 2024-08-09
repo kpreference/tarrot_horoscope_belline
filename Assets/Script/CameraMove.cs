@@ -8,8 +8,8 @@ public class CameraMove : MonoBehaviour
     public Camera camera1; // 메인 카메라
     public float moveSpeed = 10f; // 이동 속도
     public program_manager p_mamnager;
-    public float minY = -10f;
-    public float maxY = 0f;
+    public float minY ;
+    public float maxY ;
     public int pageIndex;
     void Update()
     {
@@ -23,6 +23,16 @@ public class CameraMove : MonoBehaviour
             position.y = Mathf.Clamp(position.y, minY, maxY);
             camera1.transform.position = position;
         }
+        else
+        {
+            y_zero();
+        }
         
+    }
+    public void y_zero()
+    {
+        Vector3 position = camera1.transform.position;
+        position.y = 0f;
+        camera1.transform.position = position;
     }
 }
