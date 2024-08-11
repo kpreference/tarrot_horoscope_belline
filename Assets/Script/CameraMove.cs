@@ -7,13 +7,13 @@ public class CameraMove : MonoBehaviour
     // Start is called before the first frame update
     public Camera camera1; // 메인 카메라
     public float moveSpeed = 10f; // 이동 속도
-    public program_manager p_mamnager;
+    public program_manager p_manager;
     public float minY ;
     public float maxY ;
     public int pageIndex;
     void Update()
     {
-        if (p_mamnager.pageIndex == 2)
+        if (p_manager.pageIndex == 2)
         {
             // 마우스 휠 입력 받기
             float scrollInput = Input.GetAxis("Mouse ScrollWheel");
