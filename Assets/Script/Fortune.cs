@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro; // TextMeshPro를 사용하기 위해 추가
 
 public class Fortune : MonoBehaviour
 {
@@ -9,15 +8,18 @@ public class Fortune : MonoBehaviour
     private SpriteRenderer spriteRenderer; // 오브젝트의 스프라이트 렌더러
     public program_manager pmanager; // 페이지 관리자를 참조
 
-    // 랜덤하게 선택될 스프라이트 배열 및 문구 배열
+    // 랜덤하게 선택될 스프라이트 배열
     public Sprite[] randomSprites;
-    public string[] randomMessages;
-
+    public Sprite[] randomSprites_result_couple;
+    public Sprite[] randomSprites_result_solo;
+    public Sprite[] randomSprites_result_daily;
     // 전역 변수로 변경
     private static bool isProcessing = false;
-    private Sprite selectedSprite;
-    private string selectedMessage;
 
+    // 이전 페이지에서 선택된 스프라이트를 저장하는 변수
+    private Sprite selectedSprite;
+    private int selectedIndex; // 선택된 스프라이트의 인덱스
+    Sprite resultSprite;
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -49,12 +51,11 @@ public class Fortune : MonoBehaviour
         // 페이드 아웃 시작
         yield return StartCoroutine(FadeOut());
 
-        // 랜덤 스프라이트와 문구로 변경 및 저장
+        // 랜덤 스프라이트로 변경 및 저장
         if (randomSprites.Length > 0)
         {
-            int randomIndex = Random.Range(0, randomSprites.Length);
-            selectedSprite = randomSprites[randomIndex];
-            selectedMessage = randomMessages[randomIndex]; // 선택된 문구를 저장
+            selectedIndex = Random.Range(0, randomSprites.Length);
+            selectedSprite = randomSprites[selectedIndex];
             spriteRenderer.sprite = selectedSprite;
         }
 
@@ -72,11 +73,11 @@ public class Fortune : MonoBehaviour
 
             // 페이지 인덱스를 증가시키고 새로운 페이지를 활성화
             pmanager.pageIndex++;
-            if (pmanager.pageIndex < pmanager.Pages.Length)
+            if (pmanager.pageIndex < pmanager.Pages.Length) // 페이지 인덱스가 범위를 벗어나지 않도록 확인
             {
                 pmanager.Pages[pmanager.pageIndex].SetActive(true);
 
-                // 새 페이지의 이름이 "back_will_change"인 오브젝트 찾기
+                // 새 페이지의 이름이 "tarrot_back"인 오브젝트 찾기
                 GameObject tarrotBack = GameObject.Find("back_will_change");
                 if (tarrotBack != null)
                 {
@@ -85,35 +86,48 @@ public class Fortune : MonoBehaviour
                     if (tarrotBackRenderer != null)
                     {
                         tarrotBackRenderer.sprite = selectedSprite;
+                    }
+                }
 
-                        // 문구를 출력할 새로운 텍스트 오브젝트 생성
-                        GameObject messageObject = new GameObject("Message");
-                        messageObject.transform.SetParent(tarrotBack.transform);
+                // 새 페이지의 이름이 "card_result"인 오브젝트 찾기
+                GameObject cardResult = GameObject.Find("card_result");
+                if (cardResult != null )
+                {
+                    // card_result의 SpriteRenderer를 가져옴
+                    SpriteRenderer cardResultRenderer = cardResult.GetComponent<SpriteRenderer>();
+                    if (cardResultRenderer != null)
+                    {
+                        
+                        // randomSprites_result 배열에서 동일 인덱스의 스프라이트 선택
+                        if (pmanager.what_fortune == 0)
+                        {
+                            resultSprite = randomSprites_result_couple[selectedIndex];
+                        }
+                        else if (pmanager.what_fortune == 1)
+                        {
+                            resultSprite = randomSprites_result_solo[selectedIndex];
+                        }
+                        else if (pmanager.what_fortune == 2)
+                        {
+                            resultSprite = randomSprites_result_daily[selectedIndex];
+                        }
+                         
 
-                        // 텍스트 위치 설정 (오브젝트 아래)
-                        messageObject.transform.localPosition = new Vector3(0, -tarrotBackRenderer.bounds.size.y / 2 - 0.5f, 0);
+                        // 현재 스프라이트의 크기와 새 스프라이트의 크기를 비교하여 로컬 스케일 조정
+                        AdjustSpriteScale(cardResultRenderer, resultSprite);
 
-                        // TextMeshPro 컴포넌트 추가 및 설정
-                        TextMeshPro textMeshPro = messageObject.AddComponent<TextMeshPro>();
-                        textMeshPro.text = selectedMessage;
-                        textMeshPro.fontSize = 24;
-                        textMeshPro.alignment = TextAlignmentOptions.Left; // 왼쪽 정렬
-
-                        // 텍스트 색상 설정
-                        textMeshPro.color = Color.black;
-
-                        // 텍스트 크기를 조정하는 함수 호출
-                        AdjustTextSizeToCamera(textMeshPro);
+                        // 새 스프라이트 설정
+                        cardResultRenderer.sprite = resultSprite;
                     }
                 }
             }
             else
             {
                 // 페이지 인덱스가 범위를 넘어가면 처리 (예: 마지막 페이지일 경우)
-                pmanager.pageIndex = 0;
+                pmanager.pageIndex = 0; // 예를 들어, 처음 페이지로 돌아가게 할 수도 있음
                 pmanager.Pages[pmanager.pageIndex].SetActive(true);
 
-                // 새 페이지의 이름이 "back_will_change"인 오브젝트 찾기
+                // 새 페이지의 이름이 "tarrot_back"인 오브젝트 찾기
                 GameObject tarrotBack = GameObject.Find("back_will_change");
                 if (tarrotBack != null)
                 {
@@ -122,50 +136,56 @@ public class Fortune : MonoBehaviour
                     if (tarrotBackRenderer != null)
                     {
                         tarrotBackRenderer.sprite = selectedSprite;
+                    }
+                }
 
-                        // 문구를 출력할 새로운 텍스트 오브젝트 생성
-                        GameObject messageObject = new GameObject("Message");
-                        messageObject.transform.SetParent(tarrotBack.transform);
+                // 새 페이지의 이름이 "card_result"인 오브젝트 찾기
+                GameObject cardResult = GameObject.Find("card_result");
 
-                        // 텍스트 위치 설정 (오브젝트 아래)
-                        messageObject.transform.localPosition = new Vector3(0, -tarrotBackRenderer.bounds.size.y / 2 - 0.5f, 0);
+                if (cardResult != null)
+                {
+                    // card_result의 SpriteRenderer를 가져옴
+                    SpriteRenderer cardResultRenderer = cardResult.GetComponent<SpriteRenderer>();
+                    if (cardResultRenderer != null)
+                    {
+                        // randomSprites_result 배열에서 동일 인덱스의 스프라이트 선택
+                        if (pmanager.what_fortune == 0)
+                        {
+                            resultSprite = randomSprites_result_couple[selectedIndex];
+                        }
+                        else if (pmanager.what_fortune == 1)
+                        {
+                            resultSprite = randomSprites_result_solo[selectedIndex];
+                        }
+                        else if (pmanager.what_fortune == 2)
+                        {
+                            resultSprite = randomSprites_result_daily[selectedIndex];
+                        }
 
-                        // TextMeshPro 컴포넌트 추가 및 설정
-                        TextMeshPro textMeshPro = messageObject.AddComponent<TextMeshPro>();
-                        textMeshPro.text = selectedMessage;
-                        textMeshPro.fontSize = 24;
-                        textMeshPro.alignment = TextAlignmentOptions.Left; // 왼쪽 정렬
+                        // 현재 스프라이트의 크기와 새 스프라이트의 크기를 비교하여 로컬 스케일 조정
+                        AdjustSpriteScale(cardResultRenderer, resultSprite);
 
-                        // 텍스트 색상 설정
-                        textMeshPro.color = Color.black;
-
-                        // 텍스트 크기를 조정하는 함수 호출
-                        AdjustTextSizeToCamera(textMeshPro);
+                        // 새 스프라이트 설정
+                        cardResultRenderer.sprite = resultSprite;
                     }
                 }
             }
         }
     }
 
-    void AdjustTextSizeToCamera(TextMeshPro textMeshPro)
+    void AdjustSpriteScale(SpriteRenderer spriteRenderer, Sprite newSprite)
     {
-        Camera mainCamera = Camera.main;
-        float screenWidth = mainCamera.orthographicSize * 2 * mainCamera.aspect;
+        // 현재 스프라이트와 새 스프라이트의 크기 정보 가져오기
+        Vector2 currentSize = spriteRenderer.sprite.bounds.size;
+        Vector2 newSize = newSprite.bounds.size;
 
-        // 텍스트의 폭이 카메라 화면을 넘어가면 글자 크기를 줄임
-        while (textMeshPro.preferredWidth > screenWidth)
-        {
-            textMeshPro.fontSize -= 1; // fontSize를 줄여서 글자 크기를 줄임
-            if (textMeshPro.fontSize <= 12) // 최소 크기를 설정해 무한 루프 방지
-            {
-                textMeshPro.fontSize = 12;
-                break;
-            }
-        }
+        // 현재 스프라이트와 새 스프라이트의 크기 비율 계산
+        Vector2 scale = spriteRenderer.transform.localScale;
+        scale.x *= currentSize.x / newSize.x;
+        scale.y *= currentSize.y / newSize.y;
 
-        // 줄바꿈 설정 (필요 시 자동 줄바꿈)
-        textMeshPro.enableWordWrapping = true;
-        textMeshPro.overflowMode = TextOverflowModes.Overflow;
+        // 오브젝트의 로컬 스케일을 새 스프라이트에 맞게 조정
+        spriteRenderer.transform.localScale = scale;
     }
 
     IEnumerator FadeOut()

@@ -1,30 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 
 public class program_manager : MonoBehaviour
 {
     public int pageIndex;
     public GameObject[] Pages;
-    int what_fortune;
+    public int what_fortune;
     
 
     public void MovePage(string name)
     {
-        Debug.Log(pageIndex);
-        Debug.Log(name);
-        //pageIndex = 0;
-        //Debug.Log(Pages[pageIndex]);
         Pages[pageIndex].SetActive(false);
-
         if (name == "btn_back")
         {
-            if (pageIndex == 3)
-            {
-                pageIndex -= 2;
-            }
-            else { pageIndex--; }
+            pageIndex--;
+        }else if(name=="btn_retry"){
+            Debug.Log("asdfasfdafsdasfdasfdfsadasfd");
+            SceneManager.LoadScene(0);
         }
         else//여기서 종류 정하면 될듯
         {
