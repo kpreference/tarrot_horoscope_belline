@@ -18,15 +18,7 @@ public class Button : MonoBehaviour
             if (hit.collider != null && hit.collider.gameObject == gameObject)
             {
                 string objectName = hit.collider.gameObject.name;
-                /*Debug.Log("Clicked object name: " + objectName);
-                if (objectName == "btn_back")
-                {
-                    Debug.Log("asdfasdfasfdasfd");
-                }
-                else
-                {
-                    Debug.Log("qwerewrqqrwe");
-                }*/
+                
                 p_manager.MovePage(objectName);
             }
         }
