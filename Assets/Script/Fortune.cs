@@ -54,7 +54,22 @@ public class Fortune : MonoBehaviour
         // 랜덤 스프라이트로 변경 및 저장
         if (randomSprites.Length > 0)
         {
-            selectedIndex = Random.Range(0, randomSprites.Length);
+            selectedIndex = Random.Range(0, randomSprites.Length);//0~53
+            if(pmanager.what_fortune == 2)
+            {
+                if (selectedIndex == 0)
+                {
+                    selectedIndex = 53;
+                }
+                
+            }
+            else 
+            {
+                if (selectedIndex == 53)
+                {
+                    selectedIndex = 0;
+                }
+            }
             selectedSprite = randomSprites[selectedIndex];
             spriteRenderer.sprite = selectedSprite;
         }
@@ -99,17 +114,20 @@ public class Fortune : MonoBehaviour
                     {
                         
                         // randomSprites_result 배열에서 동일 인덱스의 스프라이트 선택
-                        if (pmanager.what_fortune == 0)
+                        if (pmanager.what_fortune == 0) //커플 운세
                         {
-                            resultSprite = randomSprites_result_couple[selectedIndex];
+                            resultSprite = randomSprites_result_couple[selectedIndex]; 
                         }
-                        else if (pmanager.what_fortune == 1)
+                        else if (pmanager.what_fortune == 1) //솔로 운세
                         {
-                            resultSprite = randomSprites_result_solo[selectedIndex];
+                            resultSprite = randomSprites_result_solo[selectedIndex]; 
                         }
-                        else if (pmanager.what_fortune == 2)
+                        else if (pmanager.what_fortune == 2) //하루 운세
                         {
-                            resultSprite = randomSprites_result_daily[selectedIndex];
+                            if(selectedIndex==53)
+                                resultSprite = randomSprites_result_daily[0];
+                            else
+                                resultSprite = randomSprites_result_daily[selectedIndex]; 
                         }
                          
 
@@ -121,55 +139,7 @@ public class Fortune : MonoBehaviour
                     }
                 }
             }
-            else
-            {
-                // 페이지 인덱스가 범위를 넘어가면 처리 (예: 마지막 페이지일 경우)
-                pmanager.pageIndex = 0; // 예를 들어, 처음 페이지로 돌아가게 할 수도 있음
-                pmanager.Pages[pmanager.pageIndex].SetActive(true);
-
-                // 새 페이지의 이름이 "tarrot_back"인 오브젝트 찾기
-                GameObject tarrotBack = GameObject.Find("back_will_change");
-                if (tarrotBack != null)
-                {
-                    // tarrot_back의 SpriteRenderer를 가져와서 이전에 선택된 스프라이트로 변경
-                    SpriteRenderer tarrotBackRenderer = tarrotBack.GetComponent<SpriteRenderer>();
-                    if (tarrotBackRenderer != null)
-                    {
-                        tarrotBackRenderer.sprite = selectedSprite;
-                    }
-                }
-
-                // 새 페이지의 이름이 "card_result"인 오브젝트 찾기
-                GameObject cardResult = GameObject.Find("card_result");
-
-                if (cardResult != null)
-                {
-                    // card_result의 SpriteRenderer를 가져옴
-                    SpriteRenderer cardResultRenderer = cardResult.GetComponent<SpriteRenderer>();
-                    if (cardResultRenderer != null)
-                    {
-                        // randomSprites_result 배열에서 동일 인덱스의 스프라이트 선택
-                        if (pmanager.what_fortune == 0)
-                        {
-                            resultSprite = randomSprites_result_couple[selectedIndex];
-                        }
-                        else if (pmanager.what_fortune == 1)
-                        {
-                            resultSprite = randomSprites_result_solo[selectedIndex];
-                        }
-                        else if (pmanager.what_fortune == 2)
-                        {
-                            resultSprite = randomSprites_result_daily[selectedIndex];
-                        }
-
-                        // 현재 스프라이트의 크기와 새 스프라이트의 크기를 비교하여 로컬 스케일 조정
-                        AdjustSpriteScale(cardResultRenderer, resultSprite);
-
-                        // 새 스프라이트 설정
-                        cardResultRenderer.sprite = resultSprite;
-                    }
-                }
-            }
+            
         }
     }
 

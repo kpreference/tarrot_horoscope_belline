@@ -17,7 +17,7 @@ public class program_manager : MonoBehaviour
         {
             pageIndex--;
         }else if(name=="btn_retry"){
-            Debug.Log("asdfasfdafsdasfdasfdfsadasfd");
+            
             SceneManager.LoadScene(0);
         }
         else//여기서 종류 정하면 될듯
